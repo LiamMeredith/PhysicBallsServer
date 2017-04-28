@@ -28,7 +28,7 @@ public class PhysicBallsServer {
      * Global parameters
      */
     private static final int PORT = 11111;
-    MapaVirtual mapa = null;
+    private MapaVirtual mapa = null;
     private ObjectOutputStream out;
     private Thread listener;
     private static DatagramSocket bcListener;

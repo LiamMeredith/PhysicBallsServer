@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.physicballs.items.Ball;
 import org.physicballs.items.Peticion;
 import org.physicballs.items.Status;
 
@@ -21,6 +22,7 @@ import org.physicballs.items.Status;
 public class ClientControllerThread extends ClientThread {
 
     MapaVirtual mapa;
+
     public ClientControllerThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa) {
         super(s, cliAddr);
         this.in = in;
@@ -59,7 +61,20 @@ public class ClientControllerThread extends ClientThread {
                     peticion = (Peticion) o;
                     switch (peticion.getAccion().toLowerCase()) {
                         case "echo":
-                            out.writeObject(new Status(2, (String)peticion.getObject(0)));
+                            out.writeObject(new Status(2, (String) peticion.getObject(0)));
+                            break;
+                        case "get_windows":
+                            Peticion p = new Peticion("get_windows");
+                            p.pushData(new Status(1, "Ok"));
+                            p.pushData(mapa.getWindows());
+                            out.writeObject(p);
+                            break;
+                        case "enviar_pelota":
+                            try {
+                                mapa.addBall((int[]) peticion.getObject(1), (Ball) peticion.getObject(0));
+                            } catch (Exception e) {
+                                out.writeObject(new Status(506, "Out of bounds"));
+                            }
                             break;
                         default:
                             out.writeObject(new Status(505, "Petition - nonexistent option"));
@@ -75,4 +90,3 @@ public class ClientControllerThread extends ClientThread {
         }
     }
 }
-

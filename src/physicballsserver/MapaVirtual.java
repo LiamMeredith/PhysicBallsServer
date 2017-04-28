@@ -19,6 +19,8 @@ public class MapaVirtual {
 
     int width = 0;
     int height = 0;
+    int currentWidth = -1;
+    int currentHeight = -1;
     ModuloVisualThread[][] visuales;
 
     public MapaVirtual(int width, int height) {
@@ -42,6 +44,8 @@ public class MapaVirtual {
         for (int i = 0; i < height && !found; i++) {
             for (int j = 0; j < width && !found; j++) {
                 if (visuales[i][j] == null) {
+                    currentWidth = j;
+                    currentHeight = i;
                     found = true;
                     visuales[i][j] = mvt;
                     w = getAvailableWalls(j, i);
@@ -147,5 +151,17 @@ public class MapaVirtual {
         } catch (IOException ex) {
             Logger.getLogger(MapaVirtual.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void addBall(int[] window, Ball b) throws IOException {
+        Peticion p = new Peticion("addBall");
+        p.pushData(new Status(1, "Ok"));
+        p.pushData(b);
+        visuales[window[1]][window[0]].out.writeObject(p);
+    }
+
+    public int[] getWindows() {
+        int[] aux = {currentWidth, currentHeight};
+        return aux;
     }
 }

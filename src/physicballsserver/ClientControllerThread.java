@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.physicballs.items.AndroidBall;
 import org.physicballs.items.Ball;
 import org.physicballs.items.Peticion;
 import org.physicballs.items.Status;
@@ -71,7 +72,9 @@ public class ClientControllerThread extends ClientThread {
                             break;
                         case "enviar_pelota":
                             try {
-                                mapa.addBall((int[]) peticion.getObject(1), (Ball) peticion.getObject(0));
+                                AndroidBall baux = (AndroidBall) peticion.getObject(0);
+                                Ball b = new Ball(baux.getX(), baux.getY(), baux.getSpeed(), baux.getAccel(), baux.getRadius(), baux.getMass(), baux.getAngle(), baux.getType());
+                                mapa.addBall((int[]) peticion.getObject(1), b);
                             } catch (Exception e) {
                                 out.writeObject(new Status(506, "Out of bounds"));
                             }

@@ -31,6 +31,7 @@ public class PhysicBallsServer {
     private MapaVirtual mapa = null;
     private ObjectOutputStream out;
     private Thread listener;
+    private boolean open = false;
     private static DatagramSocket bcListener;
 
     /**
@@ -49,7 +50,7 @@ public class PhysicBallsServer {
             /**
              * Test dummy
              */
-            mapa = new MapaVirtual(2, 2);
+            mapa = new MapaVirtual(0, 0);
 
             /**
              * Local variables
@@ -85,39 +86,44 @@ public class PhysicBallsServer {
                     /**
                      * Switch that determines type of client and how to treat it
                      */
-                    switch (type.toLowerCase()) {
-                        case "modulo_visual":
-                            /**
-                             * Creates new Modulo visual client with a thread
-                             * and delivers a response
-                             */
-                            ModuloVisualThread mvt = new ModuloVisualThread(clientSock, cliAddr, in, out, mapa);
-                            Peticion reg = new Peticion("update_walls");
-                            reg.pushData(new Status(1, "Ok"));
-                            reg.pushData(mapa.push(mvt));
-                            out.writeObject(reg);
-                            break;
-                        case "server_controller":
-                            /**
-                             * Delivers an ok State indicating that it can send
-                             * a petition object
-                             */
-                            out.writeObject(new Status(1, "Ok"));
-                            new ServerControllerThread(clientSock, cliAddr, in, out, mapa);
-                            break;
-                        case "client_controller":
-                            /**
-                             * Delivers an ok State indicating that it can send
-                             * a petition object
-                             */
-                            out.writeObject(new Status(1, "Ok"));
-                            new ClientControllerThread(clientSock, cliAddr, in, out, mapa);
-                            break;
-                        default:
-                            out.writeObject(new Status(501, "Wrong type of client"));
+                    if (open || type.contentEquals("server_controller")) {
+                        switch (type.toLowerCase()) {
+                            case "modulo_visual":
+                                /**
+                                 * Creates new Modulo visual client with a
+                                 * thread and delivers a response
+                                 */
+                                ModuloVisualThread mvt = new ModuloVisualThread(clientSock, cliAddr, in, out, mapa);
+                                Peticion reg = new Peticion("update_walls");
+                                reg.pushData(new Status(1, "Ok"));
+                                reg.pushData(mapa.push(mvt));
+                                out.writeObject(reg);
+                                break;
+                            case "server_controller":
+                                /**
+                                 * Delivers an ok State indicating that it can
+                                 * send a petition object
+                                 */
+                                out.writeObject(new Status(1, "Ok"));
+                                new ServerControllerThread(clientSock, cliAddr, in, out, mapa, open);
+                                break;
+                            case "client_controller":
+                                /**
+                                 * Delivers an ok State indicating that it can
+                                 * send a petition object
+                                 */
+                                out.writeObject(new Status(1, "Ok"));
+                                new ClientControllerThread(clientSock, cliAddr, in, out, mapa);
+                                break;
+                            default:
+                                out.writeObject(new Status(501, "Wrong type of client"));
+                        }
+                    } else {
+                        out.writeObject(new Status(550, "Closed server"));
                     }
                 } else {
                     out.writeObject(new Status(501, "Wrong type of client - wrong value"));
+                    clientSock.close();
                 }
             }
         } catch (Exception e) {
@@ -132,6 +138,14 @@ public class PhysicBallsServer {
             }
 
         }
+    }
+
+    public void openServer() {
+        open = true;
+    }
+
+    public void closeServer() {
+        open = false;
     }
 
     private final void initListener() {

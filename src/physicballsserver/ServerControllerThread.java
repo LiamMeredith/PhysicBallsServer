@@ -21,11 +21,14 @@ import org.physicballs.items.Status;
 public class ServerControllerThread extends ClientThread {
 
     MapaVirtual mapa;
-    public ServerControllerThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa) {
+    private boolean open;
+
+    public ServerControllerThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, boolean open) {
         super(s, cliAddr);
         this.in = in;
         this.out = out;
         this.mapa = mapa;
+        this.open = open;
         this.start();
     }
 
@@ -59,11 +62,22 @@ public class ServerControllerThread extends ClientThread {
                     peticion = (Peticion) o;
                     switch (peticion.getAccion().toLowerCase()) {
                         case "open_map":
-                            mapa = new MapaVirtual((int)peticion.getObject(0), (int)peticion.getObject(1));
+                            mapa = new MapaVirtual((int) peticion.getObject(0), (int) peticion.getObject(1));
+                            out.writeObject(new Status(1, "Ok"));
+                            break;
+                        case "set_plantilla":
+                            mapa.setPlantilla((int[][]) peticion.getObject(0));
+                            out.writeObject(new Status(1, "Ok"));
+                            break;
+                        case "open_server":
+                            open = true;
+                            out.writeObject(new Status(1, "Ok"));
+                        case "close_server":
+                            open = false;
                             out.writeObject(new Status(1, "Ok"));
                             break;
                         case "echo":
-                            out.writeObject(new Status(2, (String)peticion.getObject(0)));
+                            out.writeObject(new Status(2, (String) peticion.getObject(0)));
                             break;
                         default:
                             out.writeObject(new Status(505, "Petition - nonexistent option"));

@@ -17,16 +17,18 @@ import org.physicballs.items.*;
  */
 public class MapaVirtual {
 
-    int width = 0;
-    int height = 0;
-    int currentWidth = -1;
-    int currentHeight = -1;
-    ModuloVisualThread[][] visuales;
+    private int width = 0;
+    private int height = 0;
+    private int currentWidth = -1;
+    private int currentHeight = -1;
+    private ModuloVisualThread[][] visuales;
+    private int[][] plantilla;
 
     public MapaVirtual(int width, int height) {
         this.width = width;
         this.height = height;
         visuales = new ModuloVisualThread[height][width];
+        plantilla = new int[height][width];
         clean();
     }
 
@@ -34,6 +36,7 @@ public class MapaVirtual {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 visuales[i][j] = null;
+                plantilla[i][j] = 1;
             }
         }
     }
@@ -43,7 +46,7 @@ public class MapaVirtual {
         ArrayList<Walls.wall> w = null;
         for (int i = 0; i < height && !found; i++) {
             for (int j = 0; j < width && !found; j++) {
-                if (visuales[i][j] == null) {
+                if (visuales[i][j] == null && plantilla[i][j] == 1) {
                     currentWidth = j;
                     currentHeight = i;
                     found = true;
@@ -113,6 +116,12 @@ public class MapaVirtual {
         }
     }
 
+    public void moveWindow(int[] w1, int[] w2) {
+        ModuloVisualThread aux = visuales[w1[0]][w1[1]];
+        visuales[w1[0]][w1[1]] = visuales[w2[0]][w2[1]];
+        visuales[w2[0]][w2[1]] = aux;
+    }
+
     public void move(ModuloVisualThread mvt, Walls.wall w, Ball b) {
         boolean found = false;
         Peticion p;
@@ -163,5 +172,20 @@ public class MapaVirtual {
     public int[] getWindows() {
         int[] aux = {currentWidth, currentHeight};
         return aux;
+    }
+
+    public void setPlantilla(int[][] p) {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                plantilla[i][j] = 0;
+            }
+        }
+        for (int i = 0; i < p.length; i++) {
+            plantilla[p[i][0]][p[i][1]] = 1;
+        }
+    }
+
+    public void setScenario(String s) {
+
     }
 }

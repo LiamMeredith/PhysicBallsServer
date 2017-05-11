@@ -73,8 +73,8 @@ public class ClientControllerThread extends ClientThread {
                         case "enviar_pelota":
                             try {
                                 AndroidBall baux = (AndroidBall) peticion.getObject(0);
-                                Ball b = new Ball(baux.getX(), baux.getY(), baux.getSpeed(), baux.getAccel(), baux.getRadius(), baux.getMass(), baux.getAngle(), baux.getType());
-                                mapa.addBall((int[]) peticion.getObject(1), b);
+                               Ball b = new Ball(baux.getX(), baux.getY(), baux.getSpeedx(), baux.getSpeedy(), baux.getRadius(), baux.getMass(),baux.getType());
+                               mapa.addBall((int[]) peticion.getObject(1), b);
                             } catch (Exception e) {
                                 out.writeObject(new Status(506, "Out of bounds"));
                             }

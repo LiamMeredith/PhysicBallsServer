@@ -21,14 +21,14 @@ import org.physicballs.items.Status;
 public class ServerControllerThread extends ClientThread {
 
     MapaVirtual mapa;
-    private boolean open;
-
-    public ServerControllerThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, boolean open) {
+    private PhysicBallsServer server;
+            
+    public ServerControllerThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, PhysicBallsServer server) {
         super(s, cliAddr);
         this.in = in;
         this.out = out;
         this.mapa = mapa;
-        this.open = open;
+        this.server = server;
         this.start();
     }
 
@@ -63,6 +63,7 @@ public class ServerControllerThread extends ClientThread {
                     switch (peticion.getAccion().toLowerCase()) {
                         case "open_map":
                             mapa = new MapaVirtual((int) peticion.getObject(0), (int) peticion.getObject(1));
+                            server.setMapa(mapa);
                             out.writeObject(new Status(1, "Ok"));
                             break;
                         case "set_plantilla":
@@ -70,11 +71,19 @@ public class ServerControllerThread extends ClientThread {
                             out.writeObject(new Status(1, "Ok"));
                             break;
                         case "open_server":
-                            open = true;
+                            server.openServer();
                             out.writeObject(new Status(1, "Ok"));
+                            break;
                         case "close_server":
-                            open = false;
+                            server.closeServer();
                             out.writeObject(new Status(1, "Ok"));
+                            break;
+                        case "get_settings":
+                            Peticion p = new Peticion("get_settings");
+                            String outString = mapa.getSettings();
+                            outString += "\n Status: " + server.status();
+                            p.pushData(outString);
+                            out.writeObject(p);
                             break;
                         case "echo":
                             out.writeObject(new Status(2, (String) peticion.getObject(0)));

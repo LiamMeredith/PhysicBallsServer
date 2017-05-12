@@ -105,7 +105,7 @@ public class PhysicBallsServer {
                                  * send a petition object
                                  */
                                 out.writeObject(new Status(1, "Ok"));
-                                new ServerControllerThread(clientSock, cliAddr, in, out, mapa, open);
+                                new ServerControllerThread(clientSock, cliAddr, in, out, mapa, this);
                                 break;
                             case "client_controller":
                                 /**
@@ -120,6 +120,7 @@ public class PhysicBallsServer {
                         }
                     } else {
                         out.writeObject(new Status(550, "Closed server"));
+                        clientSock.close();
                     }
                 } else {
                     out.writeObject(new Status(501, "Wrong type of client - wrong value"));
@@ -147,7 +148,15 @@ public class PhysicBallsServer {
     public void closeServer() {
         open = false;
     }
+    
+    public boolean status(){
+        return this.open;
+    }
 
+    public void setMapa(MapaVirtual mapa){
+        this.mapa = mapa;
+    }
+    
     private final void initListener() {
 
         this.listener = new Thread(new Runnable() {

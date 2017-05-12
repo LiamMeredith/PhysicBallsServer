@@ -188,4 +188,29 @@ public class MapaVirtual {
     public void setScenario(String s) {
 
     }
+
+    public String getSettings() {
+        String output = "";
+        output += "DIMENSION\n\nwidth: " + this.width + " height: " + this.height + "\n";
+        output += "\n\n\nPLANTILLA\n\n";
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                output += plantilla[i][j] + " ";
+            }
+            output += "\n";
+        }
+        output += "\n\n\nPANTALLAS\n\n";
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                
+                if(visuales[i][j] == null){
+                    output += "x ";
+                } else {
+                    output += "p ";
+                }
+            }
+            output += "\n";
+        }
+        return output;
+    }
 }

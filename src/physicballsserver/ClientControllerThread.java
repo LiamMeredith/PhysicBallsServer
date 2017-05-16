@@ -87,8 +87,9 @@ public class ClientControllerThread extends ClientThread {
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(ClientThread.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+            System.out.println("Bye " + this.cliAddr);
+            this.clientSock.close();
+         } catch (ClassNotFoundException ex) {
             out.writeObject(new Status(503, "Error with the petition"));
         }
     }

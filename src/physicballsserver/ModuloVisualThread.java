@@ -50,7 +50,7 @@ public class ModuloVisualThread extends ClientThread {
             processClient(in, out);
             clientSock.close();
         } catch (Exception e) {
-
+            System.out.println(e);
         }
     }
 
@@ -82,7 +82,9 @@ public class ModuloVisualThread extends ClientThread {
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(ClientThread.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Bye " + this.cliAddr);
+            mapa.remove(this);
+            this.clientSock.close();
         } catch (ClassNotFoundException ex) {
             out.writeObject(new Status(503, "Error with the petition"));
         }

@@ -22,7 +22,7 @@ public class ServerControllerThread extends ClientThread {
 
     MapaVirtual mapa;
     private PhysicBallsServer server;
-            
+
     public ServerControllerThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, PhysicBallsServer server) {
         super(s, cliAddr);
         this.in = in;
@@ -96,7 +96,8 @@ public class ServerControllerThread extends ClientThread {
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(ClientThread.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Bye " + this.cliAddr);
+            this.clientSock.close();
         } catch (ClassNotFoundException ex) {
             out.writeObject(new Status(503, "Error with the petition"));
         }

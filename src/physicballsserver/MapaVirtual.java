@@ -169,6 +169,47 @@ public class MapaVirtual {
         visuales[window[1]][window[0]].out.writeObject(p);
     }
 
+    public void remove(ModuloVisualThread mvt) {
+        boolean found = false;
+        Peticion p;
+        try {
+            for (int i = 0; i < height && !found; i++) {
+                for (int j = 0; j < width && !found; j++) {
+                    if (visuales[i][j] == mvt) {
+                        visuales[i][j] = null;
+                        found = true;
+                        //left
+                        if (j - 1 >= 0 && visuales[i][j - 1] != null) {
+                            p = new Peticion("update_removeWall");
+                            p.pushData(Walls.wall.RIGHT);
+                            visuales[i][j - 1].out.writeObject(p);
+                        }
+                        //right
+                        if (j + 1 < width && visuales[i][j + 1] != null) {
+                            p = new Peticion("update_removeWall");
+                            p.pushData(Walls.wall.LEFT);
+                            visuales[i][j + 1].out.writeObject(p);
+                        }
+                        //up
+                        if (i - 1 >= 0 && visuales[i - 1][j] != null) {
+                            p = new Peticion("update_removeWall");
+                            p.pushData(Walls.wall.BOTTOM);
+                            visuales[i - 1][j].out.writeObject(p);
+                        }
+                        //down
+                        if (i + 1 < height && visuales[i + 1][j] != null) {
+                            p = new Peticion("update_removeWall");
+                            p.pushData(Walls.wall.TOP);
+                            visuales[i + 1][j].out.writeObject(p);
+                        }
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MapaVirtual.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public int[] getWindows() {
         int[] aux = {currentWidth, currentHeight};
         return aux;
@@ -202,8 +243,8 @@ public class MapaVirtual {
         output += "\n\n\nPANTALLAS\n\n";
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                
-                if(visuales[i][j] == null){
+
+                if (visuales[i][j] == null) {
                     output += "x ";
                 } else {
                     output += "p ";

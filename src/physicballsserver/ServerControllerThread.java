@@ -85,6 +85,14 @@ public class ServerControllerThread extends ClientThread {
                             p.pushData(outString);
                             out.writeObject(p);
                             break;
+                        case "move_window":
+                            mapa.moveWindow((int[]) peticion.getObject(0), (int[]) peticion.getObject(1));
+                            out.writeObject(new Status(1, "Ok"));
+                            break;
+                        case "remove_window":
+                            mapa.remove((int[]) peticion.getObject(0));
+                            out.writeObject(new Status(1, "Ok"));
+                            break;
                         case "echo":
                             out.writeObject(new Status(2, (String) peticion.getObject(0)));
                             break;
@@ -96,6 +104,7 @@ public class ServerControllerThread extends ClientThread {
                 }
             }
         } catch (IOException ex) {
+            System.out.println(ex);
             System.out.println("Bye " + this.cliAddr);
             this.clientSock.close();
         } catch (ClassNotFoundException ex) {

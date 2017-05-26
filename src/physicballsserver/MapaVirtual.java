@@ -117,11 +117,34 @@ public class MapaVirtual {
     }
 
     public void moveWindow(int[] w1, int[] w2) {
-        ModuloVisualThread aux = visuales[w1[0]][w1[1]];
-        visuales[w1[0]][w1[1]] = visuales[w2[0]][w2[1]];
-        visuales[w2[0]][w2[1]] = aux;
+        try {
+            ModuloVisualThread visual1 = visuales[w1[1]][w1[0]];
+            ModuloVisualThread visual2 = visuales[w2[1]][w2[0]];
+            remove(w1);
+            remove(w2);
+            visuales[w2[1]][w2[0]] = visual1;
+            visuales[w1[1]][w1[0]] = visual2;
+            if (visuales[w1[1]][w1[0]] != null) {
+                update(w1[0], w1[1]);
+                Peticion p1 = new Peticion("update_walls");
+                p1.pushData(new Status(1, "Ok"));
+                p1.pushData(getAvailableWalls(w1[0], w1[1]));
+                visuales[w1[1]][w1[0]].out.writeObject(p1);
+            }
+            if (visuales[w2[1]][w2[0]] != null) {
+                update(w2[0], w2[1]);
+                Peticion p2 = new Peticion("update_walls");
+                p2.pushData(new Status(1, "Ok"));
+                p2.pushData(getAvailableWalls(w2[0], w2[1]));
+                visuales[w2[1]][w2[0]].out.writeObject(p2);
+            }
+
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
     }
 
+    //moves ball
     public void move(ModuloVisualThread mvt, Walls.wall w, Ball b) {
         boolean found = false;
         Peticion p;
@@ -210,6 +233,45 @@ public class MapaVirtual {
         }
     }
 
+    public void remove(int[] window) {
+        boolean found = false;
+        Peticion p;
+        try {
+
+            if (visuales[window[1]][window[0]] != null) {
+                visuales[window[1]][window[0]] = null;
+                found = true;
+                //left
+                if (window[0] - 1 >= 0 && visuales[window[1]][window[0] - 1] != null) {
+                    p = new Peticion("update_removeWall");
+                    p.pushData(Walls.wall.RIGHT);
+                    visuales[window[1]][window[0] - 1].out.writeObject(p);
+                }
+                //right
+                if (window[0] + 1 < width && visuales[window[1]][window[0] + 1] != null) {
+                    p = new Peticion("update_removeWall");
+                    p.pushData(Walls.wall.LEFT);
+                    visuales[window[1]][window[0] + 1].out.writeObject(p);
+                }
+                //up
+                if (window[1] - 1 >= 0 && visuales[window[1] - 1][window[0]] != null) {
+                    p = new Peticion("update_removeWall");
+                    p.pushData(Walls.wall.BOTTOM);
+                    visuales[window[1] - 1][window[0]].out.writeObject(p);
+                }
+                //down
+                if (window[1] + 1 < height && visuales[window[1] + 1][window[0]] != null) {
+                    p = new Peticion("update_removeWall");
+                    p.pushData(Walls.wall.TOP);
+                    visuales[window[1] + 1][window[0]].out.writeObject(p);
+                }
+
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MapaVirtual.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public int[] getWindows() {
         int[] aux = {currentWidth, currentHeight};
         return aux;
@@ -222,7 +284,7 @@ public class MapaVirtual {
             }
         }
         for (int i = 0; i < p.length; i++) {
-            plantilla[p[i][0]][p[i][1]] = 1;
+            plantilla[p[i][1]][p[i][0]] = 1;
         }
     }
 

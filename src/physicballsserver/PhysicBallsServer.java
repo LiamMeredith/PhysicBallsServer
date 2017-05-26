@@ -104,6 +104,7 @@ public class PhysicBallsServer {
                                  * Delivers an ok State indicating that it can
                                  * send a petition object
                                  */
+                                System.out.println("he is in");
                                 out.writeObject(new Status(1, "Ok"));
                                 new ServerControllerThread(clientSock, cliAddr, in, out, mapa, this);
                                 break;

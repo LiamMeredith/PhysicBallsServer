@@ -24,6 +24,7 @@ public class ModuloVisualThread extends ClientThread {
      */
     String type = "Modulo visual";
     MapaVirtual mapa;
+    int stadisticsID = -1;
 
     /**
      * Constructor
@@ -33,11 +34,12 @@ public class ModuloVisualThread extends ClientThread {
      * @param in
      * @param out
      */
-    public ModuloVisualThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa) {
+    public ModuloVisualThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, int id) {
         super(s, cliAddr);
         this.in = in;
         this.out = out;
         this.mapa = mapa;
+        this.stadisticsID = id;
         this.start();
     }
 
@@ -72,6 +74,12 @@ public class ModuloVisualThread extends ClientThread {
                     switch (peticion.getAccion().toLowerCase()) {
                         case "enviar_pelota":
                             mapa.move(this, (Walls.wall) peticion.getObject(1), (Ball) peticion.getObject(0));
+                            break;
+                        case "get_windows":
+                            Peticion p = new Peticion("get_windows");
+                            p.pushData(new Status(1, "Ok"));
+                            p.pushData(mapa.getWindows());
+                            out.writeObject(p);
                             break;
                         default:
                             out.writeObject(new Status(504, "NonExistent action"));

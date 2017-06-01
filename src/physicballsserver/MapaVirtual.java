@@ -272,9 +272,8 @@ public class MapaVirtual {
         }
     }
 
-    public int[] getWindows() {
-        int[] aux = {currentWidth, currentHeight};
-        return aux;
+    public int[][] getWindows() {
+        return plantilla;
     }
 
     public void setPlantilla(int[][] p) {

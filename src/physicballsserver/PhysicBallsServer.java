@@ -15,7 +15,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import org.physicballs.items.*;
 
 /**
@@ -33,6 +32,7 @@ public class PhysicBallsServer {
     private Thread listener;
     private boolean open = false;
     private static DatagramSocket bcListener;
+    private int stadisticFlag = 0;
 
     /**
      * @param args the command line arguments
@@ -93,7 +93,8 @@ public class PhysicBallsServer {
                                  * Creates new Modulo visual client with a
                                  * thread and delivers a response
                                  */
-                                ModuloVisualThread mvt = new ModuloVisualThread(clientSock, cliAddr, in, out, mapa);
+                                stadisticFlag++;
+                                ModuloVisualThread mvt = new ModuloVisualThread(clientSock, cliAddr, in, out, mapa, stadisticFlag);
                                 Peticion reg = new Peticion("update_walls");
                                 reg.pushData(new Status(1, "Ok"));
                                 reg.pushData(mapa.push(mvt));

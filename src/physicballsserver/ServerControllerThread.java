@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.physicballs.items.Peticion;
 import org.physicballs.items.Status;
 
@@ -81,7 +79,8 @@ public class ServerControllerThread extends ClientThread {
                         case "get_settings":
                             Peticion p = new Peticion("get_settings");
                             String outString = mapa.getSettings();
-                            outString += "\n Status: " + server.status();
+                            outString += "Status: " + server.status();
+                            outString += "\n";
                             p.pushData(outString);
                             out.writeObject(p);
                             break;

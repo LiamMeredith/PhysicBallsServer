@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.physicballs.items.AndroidBall;
 import org.physicballs.items.Ball;
 import org.physicballs.items.Peticion;
@@ -22,6 +20,9 @@ import org.physicballs.items.Status;
  */
 public class ClientControllerThread extends ClientThread {
 
+    /**
+     * Global parameters
+     */
     MapaVirtual mapa;
 
     public ClientControllerThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa) {
@@ -72,7 +73,7 @@ public class ClientControllerThread extends ClientThread {
                             break;
                         case "enviar_pelota":
                             try {
-                                AndroidBall baux = (AndroidBall) peticion.getObject(0);
+                               AndroidBall baux = (AndroidBall) peticion.getObject(0);
                                Ball b = new Ball(baux.getX(), baux.getY(), baux.getSpeedx(), baux.getSpeedy(), baux.getRadius(),baux.getType());
                                mapa.addBall((int[]) peticion.getObject(1), b);
                             } catch (Exception e) {

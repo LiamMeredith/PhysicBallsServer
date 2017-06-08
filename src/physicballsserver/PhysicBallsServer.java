@@ -5,6 +5,7 @@
  */
 package physicballsserver;
 
+import estadisticas.Estadisticas;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -15,6 +16,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import org.physicballs.items.*;
 
 /**
@@ -32,7 +34,8 @@ public class PhysicBallsServer {
     private Thread listener;
     private boolean open = false;
     private static DatagramSocket bcListener;
-    private int stadisticFlag = 0;
+    private int stadisticID = 0;
+    private Estadisticas statistics = null;
 
     /**
      * @param args the command line arguments
@@ -48,10 +51,12 @@ public class PhysicBallsServer {
 
         try {
             /**
-             * Test dummy
+             * Precaution initialization
              */
             mapa = new MapaVirtual(0, 0);
 
+            statistics = new Estadisticas();
+            statistics.setVisible(true);
             /**
              * Local variables
              */
@@ -93,25 +98,30 @@ public class PhysicBallsServer {
                                  * Creates new Modulo visual client with a
                                  * thread and delivers a response
                                  */
-                                stadisticFlag++;
-                                ModuloVisualThread mvt = new ModuloVisualThread(clientSock, cliAddr, in, out, mapa, stadisticFlag);
-                                Peticion reg = new Peticion("update_walls");
-                                reg.pushData(new Status(1, "Ok"));
-                                reg.pushData(mapa.push(mvt));
-                                out.writeObject(reg);
+                                stadisticID++;
+                                ModuloVisualThread mvt = new ModuloVisualThread(clientSock, cliAddr, in, out, mapa, stadisticID, statistics);
+                                ArrayList<Walls.wall> flag = mapa.push(mvt);
+                                if (flag == null) {
+                                    out.writeObject(new Status(510, "No capacity in map"));
+                                } else {
+                                    Peticion reg = new Peticion("update_walls");
+                                    reg.pushData(new Status(1, "Ok"));
+                                    reg.pushData(flag);
+                                    out.writeObject(reg);
+                                }
+
                                 break;
                             case "server_controller":
                                 /**
-                                 * Delivers an ok State indicating that it can
+                                 * Delivers an ok Status indicating that it can
                                  * send a petition object
                                  */
-                                System.out.println("he is in");
                                 out.writeObject(new Status(1, "Ok"));
                                 new ServerControllerThread(clientSock, cliAddr, in, out, mapa, this);
                                 break;
                             case "client_controller":
                                 /**
-                                 * Delivers an ok State indicating that it can
+                                 * Delivers an ok Status indicating that it can
                                  * send a petition object
                                  */
                                 out.writeObject(new Status(1, "Ok"));
@@ -143,22 +153,41 @@ public class PhysicBallsServer {
         }
     }
 
+    /**
+     * Opens access for clients
+     */
     public void openServer() {
         open = true;
     }
 
+    /**
+     * Closes access for clients
+     */
     public void closeServer() {
         open = false;
     }
-    
-    public boolean status(){
+
+    /**
+     * Status getter
+     *
+     * @return
+     */
+    public boolean status() {
         return this.open;
     }
 
-    public void setMapa(MapaVirtual mapa){
+    /**
+     * Overwrittable map, currently not in use
+     *
+     * @param mapa
+     */
+    public void setMapa(MapaVirtual mapa) {
         this.mapa = mapa;
     }
-    
+
+    /**
+     * Service that listens if someone connects via DataGram packet
+     */
     private final void initListener() {
 
         this.listener = new Thread(new Runnable() {

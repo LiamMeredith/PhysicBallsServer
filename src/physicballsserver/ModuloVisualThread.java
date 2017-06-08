@@ -5,12 +5,11 @@
  */
 package physicballsserver;
 
+import estadisticas.Estadisticas;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.physicballs.items.*;
 
 /**
@@ -24,7 +23,8 @@ public class ModuloVisualThread extends ClientThread {
      */
     String type = "Modulo visual";
     MapaVirtual mapa;
-    int stadisticsID = -1;
+    int nPantalla = -1;
+    private Estadisticas statistics;
 
     /**
      * Constructor
@@ -34,12 +34,13 @@ public class ModuloVisualThread extends ClientThread {
      * @param in
      * @param out
      */
-    public ModuloVisualThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, int id) {
+    public ModuloVisualThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, int id, Estadisticas e) {
         super(s, cliAddr);
         this.in = in;
         this.out = out;
         this.mapa = mapa;
-        this.stadisticsID = id;
+        this.nPantalla = id;
+        this.statistics = e;
         this.start();
     }
 
@@ -81,6 +82,12 @@ public class ModuloVisualThread extends ClientThread {
                             p.pushData(mapa.getWindows());
                             out.writeObject(p);
                             break;
+                        case "enviar_estadisticas":
+                            StatisticsData d = (StatisticsData) peticion.getObject(0);
+                            d.setnPantalla(nPantalla);
+                            statistics.setData(d);
+                            //System.out.println(d.velocitat);
+                            break;
                         default:
                             out.writeObject(new Status(504, "NonExistent action"));
                     }
@@ -92,6 +99,7 @@ public class ModuloVisualThread extends ClientThread {
         } catch (IOException ex) {
             System.out.println("Bye " + this.cliAddr);
             mapa.remove(this);
+            statistics.Disconect(nPantalla);
             this.clientSock.close();
         } catch (ClassNotFoundException ex) {
             out.writeObject(new Status(503, "Error with the petition"));

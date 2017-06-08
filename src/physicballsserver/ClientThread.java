@@ -5,15 +5,9 @@
  */
 package physicballsserver;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.physicballs.items.Peticion;
 
 /**
@@ -32,12 +26,20 @@ public class ClientThread extends Thread {
     protected boolean live = true;
     protected Peticion peticion;
 
+    /**
+     * Constructor
+     * @param s
+     * @param cliAddr 
+     */
     public ClientThread(Socket s, String cliAddr) {
         clientSock = s;
         this.cliAddr = cliAddr;
         System.out.println("Client connection from " + cliAddr);
     }
 
+    /**
+     * Common method for all of the clients thread that closes the thread life
+     */
     public void terminate() {
         this.live = false;
     }

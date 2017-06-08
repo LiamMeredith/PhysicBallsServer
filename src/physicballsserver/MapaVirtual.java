@@ -13,17 +13,27 @@ import org.physicballs.items.*;
 
 /**
  *
+ * Class that manages incoming Modulo Visual Threads
+ *
  * @author Liam-Portatil
  */
 public class MapaVirtual {
 
+    /**
+     * Global parameters
+     *
+     */
     private int width = 0;
     private int height = 0;
-    private int currentWidth = -1;
-    private int currentHeight = -1;
     private ModuloVisualThread[][] visuales;
     private int[][] plantilla;
 
+    /**
+     * Constructor
+     *
+     * @param width
+     * @param height
+     */
     public MapaVirtual(int width, int height) {
         this.width = width;
         this.height = height;
@@ -32,6 +42,9 @@ public class MapaVirtual {
         clean();
     }
 
+    /**
+     * Empty the bidimensional array
+     */
     private void clean() {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
@@ -41,28 +54,40 @@ public class MapaVirtual {
         }
     }
 
+    /**
+     * Inserts a new Modulo visual Thread in the virtual map If necessary it
+     * will update the rest of the clients
+     *
+     * @param mvt
+     * @return
+     */
     public ArrayList<Walls.wall> push(ModuloVisualThread mvt) {
         boolean found = false;
         ArrayList<Walls.wall> w = null;
         for (int i = 0; i < height && !found; i++) {
             for (int j = 0; j < width && !found; j++) {
                 if (visuales[i][j] == null && plantilla[i][j] == 1) {
-                    currentWidth = j;
-                    currentHeight = i;
                     found = true;
                     visuales[i][j] = mvt;
                     w = getAvailableWalls(j, i);
                     update(j, i);
                 }
-
             }
         }
         if (!found) {
             System.out.println("No capacity");
+            return null;
         }
         return w;
     }
 
+    /**
+     * Will return the walls that have a conection of a certain position
+     *
+     * @param x
+     * @param y
+     * @return
+     */
     private ArrayList<Walls.wall> getAvailableWalls(int x, int y) {
         ArrayList<Walls.wall> w = new ArrayList<Walls.wall>();
         //left
@@ -84,10 +109,16 @@ public class MapaVirtual {
         return w;
     }
 
+    /**
+     * Add walls to the neighbours screens
+     *
+     * @param x
+     * @param y
+     */
     public void update(int x, int y) {
         Peticion p;
-        //left
         try {
+            //left
             if (x - 1 >= 0 && visuales[y][x - 1] != null) {
                 p = new Peticion("update_addWall");
                 p.pushData(Walls.wall.RIGHT);
@@ -116,6 +147,12 @@ public class MapaVirtual {
         }
     }
 
+    /**
+     * Moves windows position, Changes one position for the other
+     *
+     * @param w1
+     * @param w2
+     */
     public void moveWindow(int[] w1, int[] w2) {
         try {
             ModuloVisualThread visual1 = visuales[w1[1]][w1[0]];
@@ -144,7 +181,13 @@ public class MapaVirtual {
         }
     }
 
-    //moves ball
+    /**
+     * Moves ball from one screen to another
+     *
+     * @param mvt
+     * @param w
+     * @param b
+     */
     public void move(ModuloVisualThread mvt, Walls.wall w, Ball b) {
         boolean found = false;
         Peticion p;
@@ -185,6 +228,14 @@ public class MapaVirtual {
         }
     }
 
+    /**
+     * Adds ball to Modulo visual This method is similar to move, but it sends
+     * it currently to the position in the Map and not in a wall
+     *
+     * @param window
+     * @param b
+     * @throws IOException
+     */
     public void addBall(int[] window, Ball b) throws IOException {
         Peticion p = new Peticion("addBall");
         p.pushData(new Status(1, "Ok"));
@@ -192,6 +243,11 @@ public class MapaVirtual {
         visuales[window[1]][window[0]].out.writeObject(p);
     }
 
+    /**
+     * Removes window from virtual map using the thread reference
+     *
+     * @param mvt
+     */
     public void remove(ModuloVisualThread mvt) {
         boolean found = false;
         Peticion p;
@@ -233,14 +289,16 @@ public class MapaVirtual {
         }
     }
 
+    /**
+     * Removes window from virtual map using the window position
+     *
+     * @param window
+     */
     public void remove(int[] window) {
-        boolean found = false;
         Peticion p;
         try {
-
             if (visuales[window[1]][window[0]] != null) {
                 visuales[window[1]][window[0]] = null;
-                found = true;
                 //left
                 if (window[0] - 1 >= 0 && visuales[window[1]][window[0] - 1] != null) {
                     p = new Peticion("update_removeWall");
@@ -272,10 +330,29 @@ public class MapaVirtual {
         }
     }
 
+    /**
+     * Returns the screens and the positions
+     *
+     * @return
+     */
     public int[][] getWindows() {
-        return plantilla;
+        int[][] output = new int[height][width];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (visuales[i][j] == null) {
+                    output[i][j] = 0;
+                } else {
+                    output[i][j] = 1;
+                }
+            }
+        }
+        return output;
     }
 
+    /**
+     * Stablishes a template to indicate a pattern for the new screens
+     * @param p 
+     */
     public void setPlantilla(int[][] p) {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
@@ -287,24 +364,48 @@ public class MapaVirtual {
         }
     }
 
+    /**
+     * Method and information given by tha data base
+     * @param s 
+     */
     public void setScenario(String s) {
 
     }
 
+    /**
+     * Devuelve un string con toda la configuracion
+     * @return 
+     */
     public String getSettings() {
         String output = "";
-        output += "DIMENSION\n\nwidth: " + this.width + " height: " + this.height + "\n";
-        output += "\n\n\nPLANTILLA\n\n";
+        output += "********************\n";
+        output += "* DIMENSION        *\n";
+        output += "********************\n";
+        output += "\n";
+        output += "*Width: " + this.width + "\n";
+        output += "*Height: " + this.height + "\n";
+        output += "\n";
+        output += "\n";
+
+        output += "********************\n";
+        output += "* PLANTILLA        *\n";
+        output += "********************\n";
+        output += "\n";
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 output += plantilla[i][j] + " ";
             }
             output += "\n";
         }
-        output += "\n\n\nPANTALLAS\n\n";
+        output += "\n";
+        output += "\n";
+
+        output += "********************\n";
+        output += "* PANTALLAS        *\n";
+        output += "********************\n";
+        output += "\n";
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-
                 if (visuales[i][j] == null) {
                     output += "x ";
                 } else {
@@ -313,6 +414,9 @@ public class MapaVirtual {
             }
             output += "\n";
         }
+        output += "\n";
+        output += "\n";
+
         return output;
     }
 }

@@ -5,6 +5,7 @@
  */
 package physicballsserver;
 
+import database.DBHandler;
 import estadisticas.Estadisticas;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -36,6 +37,8 @@ public class PhysicBallsServer {
     private static DatagramSocket bcListener;
     private int stadisticID = 0;
     private Estadisticas statistics = null;
+    private DBHandler db = null;
+    private String scenario = "No map";
 
     /**
      * @param args the command line arguments
@@ -55,8 +58,13 @@ public class PhysicBallsServer {
              */
             mapa = new MapaVirtual(0, 0);
 
+            //Objeto de Toni
             statistics = new Estadisticas();
             statistics.setVisible(true);
+            
+            //Objeto de Tore
+            db = new DBHandler();
+            
             /**
              * Local variables
              */
@@ -117,7 +125,7 @@ public class PhysicBallsServer {
                                  * send a petition object
                                  */
                                 out.writeObject(new Status(1, "Ok"));
-                                new ServerControllerThread(clientSock, cliAddr, in, out, mapa, this);
+                                new ServerControllerThread(clientSock, cliAddr, in, out, mapa, this, db);
                                 break;
                             case "client_controller":
                                 /**
@@ -184,7 +192,23 @@ public class PhysicBallsServer {
     public void setMapa(MapaVirtual mapa) {
         this.mapa = mapa;
     }
+    
+    /**
+     * Sets scenario
+     * @param s 
+     */
+    public void setScenario(String s){
+        this.scenario = s;
+    }
 
+    /**
+     * Gets scenario
+     * @return 
+     */
+    public String getScenario(){
+        return this.scenario;
+    }
+    
     /**
      * Service that listens if someone connects via DataGram packet
      */

@@ -25,8 +25,7 @@ public class DBHandler {
     }
 
     public DBHandler() {
-
-        emf = Persistence.createEntityManagerFactory("PhysicBallsPU");
+        emf = Persistence.createEntityManagerFactory("PhysicBallsServerPU");
     }
 
     public void insertSpace(String spaceName) {

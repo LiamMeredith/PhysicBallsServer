@@ -351,7 +351,8 @@ public class MapaVirtual {
 
     /**
      * Stablishes a template to indicate a pattern for the new screens
-     * @param p 
+     *
+     * @param p
      */
     public void setPlantilla(int[][] p) {
         for (int i = 0; i < height; i++) {
@@ -366,7 +367,8 @@ public class MapaVirtual {
 
     /**
      * Method and information given by tha data base
-     * @param s 
+     *
+     * @param s
      */
     public void setScenario(String s) {
 
@@ -374,7 +376,8 @@ public class MapaVirtual {
 
     /**
      * Devuelve un string con toda la configuracion
-     * @return 
+     *
+     * @return
      */
     public String getSettings() {
         String output = "";

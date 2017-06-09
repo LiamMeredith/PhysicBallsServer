@@ -112,9 +112,10 @@ public class PhysicBallsServer {
                                 if (flag == null) {
                                     out.writeObject(new Status(510, "No capacity in map"));
                                 } else {
-                                    Peticion reg = new Peticion("update_walls");
+                                    Peticion reg = new Peticion("registration");
                                     reg.pushData(new Status(1, "Ok"));
                                     reg.pushData(flag);
+                                    reg.pushData(scenario);
                                     out.writeObject(reg);
                                 }
 

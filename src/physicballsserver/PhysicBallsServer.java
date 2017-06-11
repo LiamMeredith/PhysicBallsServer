@@ -18,6 +18,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import map_generator.MapDesigner;
 import org.physicballs.items.*;
 
 /**
@@ -38,6 +40,7 @@ public class PhysicBallsServer {
     private int stadisticID = 0;
     private Estadisticas statistics = null;
     private DBHandler db = null;
+    private MapDesigner md = null;
     private String scenario = "No map";
 
     /**
@@ -61,10 +64,17 @@ public class PhysicBallsServer {
             //Objeto de Toni
             statistics = new Estadisticas();
             statistics.setVisible(true);
-            
+
             //Objeto de Tore
             db = new DBHandler();
-            
+
+            //Objecto de miki gines
+            String message = "Would like to open the map generator";
+            int reply = JOptionPane.showConfirmDialog(null, message, "Map generator", JOptionPane.YES_NO_OPTION);
+            if (reply == JOptionPane.YES_OPTION) {
+                md = new MapDesigner();
+            } 
+
             /**
              * Local variables
              */
@@ -116,6 +126,7 @@ public class PhysicBallsServer {
                                     reg.pushData(new Status(1, "Ok"));
                                     reg.pushData(flag);
                                     reg.pushData(scenario);
+                                    reg.pushData(db.selectSpace(scenario));
                                     out.writeObject(reg);
                                 }
 
@@ -193,23 +204,25 @@ public class PhysicBallsServer {
     public void setMapa(MapaVirtual mapa) {
         this.mapa = mapa;
     }
-    
+
     /**
      * Sets scenario
-     * @param s 
+     *
+     * @param s
      */
-    public void setScenario(String s){
+    public void setScenario(String s) {
         this.scenario = s;
     }
 
     /**
      * Gets scenario
-     * @return 
+     *
+     * @return
      */
-    public String getScenario(){
+    public String getScenario() {
         return this.scenario;
     }
-    
+
     /**
      * Service that listens if someone connects via DataGram packet
      */

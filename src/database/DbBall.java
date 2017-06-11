@@ -66,7 +66,7 @@ public class DbBall implements Serializable {
     private Character type;
     @Basic(optional = false)
     @Column(name = "id_space")
-    private DbSpace idSpace;
+    private int idSpace;
 
     public DbBall() {
     }
@@ -75,7 +75,7 @@ public class DbBall implements Serializable {
         this.id = id;
     }
 
-    public DbBall(Integer id, float x, float y, double speed, float accel, float radius, float angle, Character type, DbSpace idSpace) {
+    public DbBall(Integer id, float x, float y, double speed, float accel, float radius, float angle, Character type, int idSpace) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -151,11 +151,11 @@ public class DbBall implements Serializable {
         this.type = type;
     }
 
-    public DbSpace getIdSpace() {
+    public int getIdSpace() {
         return idSpace;
     }
 
-    public void setIdSpace(DbSpace idSpace) {
+    public void setIdSpace(int idSpace) {
         this.idSpace = idSpace;
     }
 

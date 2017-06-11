@@ -67,6 +67,7 @@ public class ServerControllerThread extends ClientThread {
                             mapa = new MapaVirtual((int) peticion.getObject(0), (int) peticion.getObject(1));
                             server.setMapa(mapa);
                             if (peticion.getData().size() > 2) {
+                                System.out.println((String) peticion.getObject(2));
                                 server.setScenario((String) peticion.getObject(2));
                             }
                             out.writeObject(new Status(1, "Ok"));

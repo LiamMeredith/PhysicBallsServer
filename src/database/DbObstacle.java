@@ -54,7 +54,7 @@ public class DbObstacle implements Serializable {
     private float height;
     @Basic(optional = false)
     @Column(name = "id_space")
-    private DbSpace idSpace;
+    private int idSpace;
 
     public DbObstacle() {
     }
@@ -63,7 +63,7 @@ public class DbObstacle implements Serializable {
         this.id = id;
     }
 
-    public DbObstacle(Integer id, float x, float y, float width, float height, DbSpace idSpace) {
+    public DbObstacle(Integer id, float x, float y, float width, float height, int idSpace) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -112,11 +112,11 @@ public class DbObstacle implements Serializable {
         this.height = height;
     }
 
-    public DbSpace getIdSpace() {
+    public int getIdSpace() {
         return idSpace;
     }
 
-    public void setIdSpace(DbSpace idSpace) {
+    public void setIdSpace(int idSpace) {
         this.idSpace = idSpace;
     }
 

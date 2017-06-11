@@ -51,7 +51,7 @@ public class DbStopitem implements Serializable {
     private float height;
     @Basic(optional = false)
     @Column(name = "id_space")
-    private DbSpace idSpace;
+    private int idSpace;
 
     public DbStopitem() {
     }
@@ -60,7 +60,7 @@ public class DbStopitem implements Serializable {
         this.id = id;
     }
 
-    public DbStopitem(Integer id, float x, float y, float width, float height, DbSpace idSpace) {
+    public DbStopitem(Integer id, float x, float y, float width, float height, int idSpace) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -109,11 +109,11 @@ public class DbStopitem implements Serializable {
         this.height = height;
     }
 
-    public DbSpace getIdSpace() {
+    public int getIdSpace() {
         return idSpace;
     }
 
-    public void setIdSpace(DbSpace idSpace) {
+    public void setIdSpace(int idSpace) {
         this.idSpace = idSpace;
     }
 

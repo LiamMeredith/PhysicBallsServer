@@ -188,7 +188,7 @@ public class MapaVirtual {
      * @param w
      * @param b
      */
-    public void move(ModuloVisualThread mvt, Walls.wall w, Ball b) {
+    public synchronized void move(ModuloVisualThread mvt, Walls.wall w, Ball b) {
         boolean found = false;
         Peticion p;
         try {
@@ -201,24 +201,26 @@ public class MapaVirtual {
                             p.pushData(new Status(1, "Ok"));
                             p.pushData(b);
                             visuales[i - 1][j].out.writeObject(p);
+                            visuales[i - 1][j].out.flush();
+                            writeBall(visuales[i - 1][j], p);
                         }
                         if (w == Walls.wall.BOTTOM) {
                             p = new Peticion("addBall");
                             p.pushData(new Status(1, "Ok"));
                             p.pushData(b);
-                            visuales[i + 1][j].out.writeObject(p);
+                            writeBall(visuales[i + 1][j], p);
                         }
                         if (w == Walls.wall.RIGHT) {
                             p = new Peticion("addBall");
                             p.pushData(new Status(1, "Ok"));
                             p.pushData(b);
-                            visuales[i][j + 1].out.writeObject(p);
+                            writeBall(visuales[i][j + 1], p);
                         }
                         if (w == Walls.wall.LEFT) {
                             p = new Peticion("addBall");
                             p.pushData(new Status(1, "Ok"));
                             p.pushData(b);
-                            visuales[i][j - 1].out.writeObject(p);
+                            writeBall(visuales[i][j - 1], p);
                         }
                     }
                 }
@@ -236,11 +238,21 @@ public class MapaVirtual {
      * @param b
      * @throws IOException
      */
-    public void addBall(int[] window, Ball b) throws IOException {
+    public synchronized void addBall(int[] window, Ball b) throws IOException {
         Peticion p = new Peticion("addBall");
         p.pushData(new Status(1, "Ok"));
         p.pushData(b);
-        visuales[window[1]][window[0]].out.writeObject(p);
+        writeBall(visuales[window[1]][window[0]], p);
+    }
+    
+    public synchronized void writeBall(ModuloVisualThread mvt, Peticion p){
+        try {
+            mvt.out.reset();
+            mvt.out.writeObject(p);
+            
+        } catch (IOException ex) {
+            Logger.getLogger(MapaVirtual.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

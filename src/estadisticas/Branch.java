@@ -1,12 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author Toni
- */
 package estadisticas;
 
 import java.awt.Color;
@@ -15,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
 
+/**
+ * Esta clase extiende de un jPanel, se utiliza para mostrar la informacion de los ítems 
+ * @author Toni Cifre Vicens
+ */
 public class Branch extends javax.swing.JPanel {
 
      // Numero de items en el branch
@@ -22,6 +17,9 @@ public class Branch extends javax.swing.JPanel {
     // Elemento falso para rellenar espacios
     private List<JLabel> ghostItem;
 
+    /**
+     * Constructor que se encarga de transformar el jpanel a transparente, instanciar el ghostItem y establece el grid layout.
+     */
     public Branch() {
         initComponents();
         container.setOpaque(false);
@@ -29,15 +27,28 @@ public class Branch extends javax.swing.JPanel {
         this.ghostItem = new ArrayList<JLabel>();
     }
 
+    /**
+     * Añade un itmem al JPanel.
+     * @param item
+     */
     public void addItem(Item item) {
         container.add(item);
         count++;
     }
+
+    /**
+     * Añade un progres item al JPanel.
+     * @param item
+     */
     public void addItem(ProgresItem item) {
         container.add(item);
         count++;
     }
 
+    /**
+     * Separa todos los items i los coloca uno balo otro generando items transparentes para darle el espacio adecuado.
+     * @param max
+     */
     public void ajustarItems(int max) {
         for (JLabel l : this.ghostItem) {
             container.remove(l);

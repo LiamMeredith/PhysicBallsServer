@@ -1,12 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author Toni
- */
 package estadisticas;
 
 import java.awt.Color;
@@ -25,6 +16,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
+/**
+ * Esta clase posee una lista de ramas que permitira guardar dentro suya tantas ramas y subramas como queramos y poder tratar sus valores y sus caracteristicas tales como sus iconos, el texto a mostrar, el tipo de fuente, el background... 
+ * Posee animaciones para poder contraer y expandir cada rama y un resize para que se adapten al tamaño de la pantalla.
+ * @author Toni Cifre Vicens
+ */
 public final class Menu extends JPanel {
 
     // Heigth de cada menu
@@ -44,6 +40,9 @@ public final class Menu extends JPanel {
     private TreeMap<ItemPrincipal, List<ItemSecundario>> leafMap;
     private TreeMap<ItemPrincipal, List<ProgresItemSecundatio>> leafProgresMap;
 
+    /**
+     * El contructor añade el listener para actualizar el espazio al cambie el tamaño de la pantalla e instancia un mapa cor cada tipo de item.
+     */
     public Menu() {
         this.addComponentListener(getDefaultComponentAdapter());
         this.setLayout(null);
@@ -51,22 +50,9 @@ public final class Menu extends JPanel {
         this.leafProgresMap = new TreeMap<ItemPrincipal, List<ProgresItemSecundatio>>();
     }
     
-    public MouseAdapter getDefaultLeafMouseAdapter() {
-        return new MouseAdapter() {
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                ItemSecundario item = (ItemSecundario) e.getSource();
-                for (ItemSecundario leaf : Menu.this.getSecundarios()) {
-                    leaf.setSelected(false);
-                    leaf.repaint();
-                }
-                
-                item.setSelected(true);
-            }
-        };
-    }
-    
+    /**
+     * Al pulsar una rama principal, cambia su valor seleccionado y llama una animacion que desplegara su jPanel si esta seleccionado o lo contraera si no lo esta.
+     */
     private MouseAdapter getDefaultMenuMouseAdapter() {
         return new MouseAdapter() {
             @Override
@@ -77,7 +63,7 @@ public final class Menu extends JPanel {
                     lastSelectedMenu=item;
                     item.setSelected(false);
                 }else{
-                    for (ItemPrincipal menu : getMenus()) {
+                    for (ItemPrincipal menu : getItemPrincipals()) {
                         if (menu.isSelected()) {
                             lastSelectedMenu = menu;
                             menu.setSelected(false);
@@ -94,6 +80,9 @@ public final class Menu extends JPanel {
         };
     }
 
+    /**
+     * Animacion de extension o contraccion del jPanel enfocada a esconder o mostrar la información de una pantalla
+     */
     private void startAnimation() {
         Thread thread = new Thread(new Runnable() {
 
@@ -123,17 +112,26 @@ public final class Menu extends JPanel {
         thread.start();
     }
 
+    /**
+     * Actualiza el jPanel interno de cada rama con la intencion contraerse o exterderse para poder ajecutar la animación.
+     */
     public void update() {
-        for (ItemPrincipal menu : getMenus()) {
+        getItemPrincipals().forEach((menu) -> {
             menu.getBranchPanel().updateUI();
-        }
+        });
     }
 
+    /**
+     * Va modificando pixel a pixel el height del branch para contraer o expandir una rama.
+     * Si la rama se ha seleccionado, se extiende todo el espacio disponible y contrae la que estaba previamente abierta.
+     * En el caso de que se desseleccione solo se contrae la pulsada dejando el resto del espacio libre.
+     * @param g Graphics.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         int y = 0;
-        for (ItemPrincipal menu : getMenus()) {
+        for (ItemPrincipal menu : getItemPrincipals()) {
             menu.setSize(this.getWidth(), this.menusSize);
             menu.setLocation(0, y);
 
@@ -157,10 +155,19 @@ public final class Menu extends JPanel {
         update();
     }
 
-    public List<ItemPrincipal> getMenus() {
+    /**
+     * Devuelve un list que posee todos los items principales del menu.
+     * @return list con todos los items principales del menu.
+     */
+    public List<ItemPrincipal> getItemPrincipals() {
         return new ArrayList<ItemPrincipal>(leafMap.keySet());
     }
 
+    /**
+     * devuelve un item principal en concreto del menu a traves de su identificador.
+     * @param name identificador del item.
+     * @return item principal
+     */
     public ItemPrincipal getMenu(String name) {
         for (ItemPrincipal menu : leafMap.keySet()) {
             if (menu.getName().equals(name)) {
@@ -170,6 +177,10 @@ public final class Menu extends JPanel {
         return null;
     }
 
+    /**
+     * Devuelve un list que posee todos los items secundarios del menu.
+     * @return List con todos los items secundarios del menu.
+     */
     public List<ItemSecundario> getSecundarios() {
         List<ItemSecundario> leafs = new ArrayList<ItemSecundario>();
         for (ItemPrincipal menu : leafMap.keySet()) {
@@ -178,6 +189,10 @@ public final class Menu extends JPanel {
         return leafs;
     }
     
+    /**
+     * Devuelve un list que posee todos los progres items secundarios del menu.
+     * @return List con todos los progres items secundarios del menu.
+     */
     public List<ProgresItemSecundatio> getProgresSecundarios() {
         List<ProgresItemSecundatio> leafs = new ArrayList<ProgresItemSecundatio>();
         for (ItemPrincipal menu : leafProgresMap.keySet()) {
@@ -186,17 +201,27 @@ public final class Menu extends JPanel {
         return leafs;
     }
 
-    public List<ItemSecundario> getSecundariosDe(String menuName) {
+    /**
+     * Devuelve todos los items secundarios de un item principal en concreto definido por su clave.
+     * @param name identificador del item principal.
+     * @return List de items secundarios.
+     */
+    public List<ItemSecundario> getSecundariosDe(String name) {
         List<ItemSecundario> leafs = new ArrayList<ItemSecundario>();
         for (ItemPrincipal menu : leafMap.keySet()) {
-            if (menu.getName().equals(menuName)) {
+            if (menu.getName().equals(name)) {
                 leafs.addAll(leafMap.get(menu));
             }
         }
         return leafs;
     }
 
-    public ItemSecundario getSecundarios(String name) {
+    /**
+     * Devuelve un item secundario en concreto definido por su identificador.
+     * @param name identificador del item.
+     * @return Item secundario.
+     */
+    public ItemSecundario getSecundario(String name) {
         for (ItemSecundario leaf : getSecundarios()) {
             if (leaf.getName().equals(name)) {
                 return leaf;
@@ -205,6 +230,11 @@ public final class Menu extends JPanel {
         return null;
     }
     
+    /**
+     * Devuelve un progres item secundario en concreto definido por su identificador.
+     * @param name identificador del item.
+     * @return Progres item secundatio.
+     */
     public ProgresItemSecundatio getProgersSedundario(String name) {
         for (ProgresItemSecundatio leaf : getProgresSecundarios()) {
             if (leaf.getName().equals(name)) {
@@ -214,12 +244,20 @@ public final class Menu extends JPanel {
         return null;
     }
     
+    /**
+     * Setea el valor maximo del todos los progres items.
+     * @param value valor maximo en forma de integer.
+     */
     public void setProgresMaxValue(int value) {
         for (ProgresItemSecundatio leaf : getProgresSecundarios()) {
                 leaf.setMaximum(value);
         }
     }
 
+    /**
+     * Setea un listener para controlar que cuando el tamaño de la pantalla sea modificado los menus se adapten a nuevo tamaño.
+     * @return ComponentAdapter.
+     */
     public ComponentAdapter getDefaultComponentAdapter() {
         return new ComponentAdapter() {
 
@@ -230,6 +268,9 @@ public final class Menu extends JPanel {
         };
     }
 
+    /**
+     * Calcula el espacio disponible para ajustar el espacio al abrir, cerrar o añadir una rama o al modificar el tamaño de la ventana.
+     */
     public void calcularEspacio() {
         int height = getHeight();
         double scale = menusSize / 20;
@@ -240,6 +281,12 @@ public final class Menu extends JPanel {
         update();
     }
 
+    /**
+     * Crea un nuevo item princial con un texto por defecto y un identificador unico y lo añade al menu.
+     * @param title Texto por defecto.
+     * @param name nombre unico del item.
+     * @return Item principal.
+     */
     private ItemPrincipal crearItemPrincipal(String title, String name) {
         ItemPrincipal menu = new ItemPrincipal(title);
         menu.setName(name);
@@ -247,20 +294,40 @@ public final class Menu extends JPanel {
         return menu;
     }
 
+    /**
+     * Crea un nuevo item secundario con un texto por defecto y un identificador unico y lo añade al menu.
+     * @param title Texto por defecto.
+     * @param name Nombre unico del item.
+     * @return Item secundario.
+     */
     private ItemSecundario crearItemSecundario(String title, String name) {
         ItemSecundario leaf = new ItemSecundario(title);
         leaf.setName(name);
         return leaf;
     }
     
+    /**
+     * Crea un nuevo progres item princial con sus valor, su maximo y minimo y su identificador unico.
+     * @param val valor del progreso.
+     * @param min valor minimo del progres.
+     * @param max Valor maximo del progres.
+     * @param name nombre unico.
+     * @return  Progres item secundatio
+     */
     private ProgresItemSecundatio crearItemSecundarioPregres(int val, int min,int max, String name) {
         ProgresItemSecundatio leaf = new ProgresItemSecundatio(min, max, name);
         leaf.setValue(val);
         return leaf;
     }
 
-    public void añadirIremSecundario(String menuName, String leafName, String leafTitle) {
-        for (ItemPrincipal menu : getMenus()) {
+    /**
+     * Añade un nuevo item secundatio a un item principal en concreto y a su mapa correspondiente y le define su nombre y titulo.
+     * @param menuName nombre del item principal.
+     * @param leafName nombre unico del item secundario.
+     * @param leafTitle titulo del item secundatio.
+     */
+    public void añadirItemSecundario(String menuName, String leafName, String leafTitle) {
+        for (ItemPrincipal menu : getItemPrincipals()) {
             if (menu.getName().equals(menuName)) {
                 ItemSecundario item = crearItemSecundario(leafTitle, leafName);
                 this.leafMap.get(menu).add(item);
@@ -269,8 +336,17 @@ public final class Menu extends JPanel {
             }
         }
     }
+
+    /**
+     *  Añade un nuevo progres item secundatio a un item principal en concreto y a su mapa correspondiente y le define su nombre y titulo.
+     * @param menuName nombre del item principal.
+     * @param val valor del progres bar.
+     * @param min valor minimo del progres bar.
+     * @param max valor maximo del progres bar.
+     * @param name nombre unico del item.
+     */
     public void añadirItemSecundarioProgre(String menuName, int val, int min,int max, String name) {
-        for (ItemPrincipal menu : getMenus()) {
+        for (ItemPrincipal menu : getItemPrincipals()) {
             if (menu.getName().equals(menuName)) {
                 ProgresItemSecundatio item = crearItemSecundarioPregres(val, min, max, name);
                 item.setStringPainted(true);
@@ -282,7 +358,12 @@ public final class Menu extends JPanel {
         }
     }
 
-    public void añadirNuevoMenu(String menuName, String menuTitle) {
+    /**
+     *  Crea un nuevo item principal con su nombre unico y titulo y los añade al mapa junto con un arraylist de items secundarios para poder asociarle items secundarios.
+     * @param menuName nombre unico del item principal.
+     * @param menuTitle titulo del item principal.
+     */
+    public void añadirNuevoItemPrincipal(String menuName, String menuTitle) {
         List<ItemSecundario> leafs = new ArrayList<>();
         List<ProgresItemSecundatio> progresLeafs = new ArrayList<>();
         ItemPrincipal menu = crearItemPrincipal(menuTitle, menuName);
@@ -299,6 +380,10 @@ public final class Menu extends JPanel {
         this.add(menu.getBranchPanel());
     }
 
+    /**
+     * Instancia el color del background al timen principal i a sus secundarios asociados al ser creados.
+     * @param back color del background.
+     */
     @Override
     public void setBackground(Color back) {
         if (this.leafMap == null) {
@@ -313,27 +398,46 @@ public final class Menu extends JPanel {
         }
     }
 
-    public void setText(String leafName, String leafText) {
-            getSecundarios(leafName).setText(leafText);
+    /**
+     *  Cambia el texto de un item secundario especificado a traves de su identificador.
+     * @param name Nombre del item.
+     * @param text Texto que se le desea poner.
+     */
+    public void setText(String name, String text) {
+            getSecundario(name).setText(text);
     }
     
-    public void setProgres(String leafName, int value) {
-        ProgresItemSecundatio progres= getProgersSedundario(leafName);
+    /**
+     *  Cambia el valor de un progres bar en concreto seleccionado a traves de su nombre unico y lo repinta.
+     * @param name nombre unico del progres bar.
+     * @param value valor.
+     */
+    public void setProgres(String name, int value) {
+        ProgresItemSecundatio progres= getProgersSedundario(name);
         progres.setValue(value);
         progres.repaint();
     }
     
-    public void setMenuBorders(Border border) {
-        for (ItemPrincipal menu : getMenus()) {
+    /**
+     * Establece el estilo de borde de todos los items principales.
+     * @param border Tipo de borde.
+     */
+    public void setItemPrincipalBorde(Border border) {
+        getItemPrincipals().forEach((menu) -> {
             menu.setBorder(border);
-        }
+        });
     }
 
+    /**
+     * Setea el tipo de fuente de todos los items principales y secundarios.
+     * @param font Tipo de fuente.
+     */
+    @Override
     public void setFont(Font font) {
         if (this.leafMap == null) {
             return;
         }
-        getMenus().stream().map((menu) -> {
+        getItemPrincipals().stream().map((menu) -> {
             menu.setFont(font);
             return menu;
         }).forEachOrdered((menu) -> {
@@ -343,22 +447,35 @@ public final class Menu extends JPanel {
         });
     }
     
+    /**
+     * Cambia el icono de un item principal establecido por su identificador para poder observar si su pantalla correspondiente aun sige connectada.
+     * @param name nombre del item principal.
+     */
     public void setIconDisconected(String name) {
-        getMenus().stream().filter((menu) -> (menu.getName().equals(name))).forEachOrdered((menu) -> {
+        getItemPrincipals().stream().filter((menu) -> (menu.getName().equals(name))).forEachOrdered((menu) -> {
             ImageIcon i = new ImageIcon(this.getClass().getResource("resources/disconected.png"));
             menu.setNormalIcon(i);
             menu.setSelectedIcon(i);
         });
     }
     
+    /**
+     * Cambia el icono por el deseado de un item secundario a traves de su identificador.
+     * @param name identificador del item.
+     * @param url url del icono.
+     */
     public void setIcon(String name, String url) {
-        getMenus().stream().filter((menu) -> (menu.getName().equals(name))).forEachOrdered((menu) -> {
+        getItemPrincipals().stream().filter((menu) -> (menu.getName().equals(name))).forEachOrdered((menu) -> {
             ImageIcon i = new ImageIcon(this.getClass().getResource(url));
             menu.setNormalIcon(i);
             menu.setSelectedIcon(i);
         });
     }
     
+    /**
+     * Establece los iconos por defecto de todos los items secundarios de un item principal.
+     * @param name
+     */
     public void setIcons(String name) {
         ImageIcon i;
         for (ItemSecundario leaf : getSecundariosDe(name)) {
@@ -386,7 +503,7 @@ public final class Menu extends JPanel {
         if (this.leafMap == null) {
             return;
         }
-        for (ItemPrincipal menu : getMenus()) {
+        for (ItemPrincipal menu : getItemPrincipals()) {
             menu.setForeground(fg);
             for (ItemSecundario leaf : getSecundariosDe(menu.getName())) {
                 leaf.setForeground(fg);

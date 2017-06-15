@@ -55,6 +55,62 @@ public class DBHandler {
 
         return spaceList;
     }
+    
+    /**
+     * método que al pasarle un nombre de space, busca en la base de datos todos
+     * los objetos asociados a ese space y los elimina incluido el space.
+     *0,n
+     * @param spaceName
+     */
+    public void deleteSpaceCascade(String spaceName) {
+
+        int id = 0;
+        DbSpaceJpaController spacejpa = new DbSpaceJpaController(emf);
+        DbBallJpaController balljpa = new DbBallJpaController(emf);
+        DbObstacleJpaController obstaclejpa = new DbObstacleJpaController(emf);
+        DbStopitemJpaController stopitemjpa = new DbStopitemJpaController(emf);
+
+        List<DbSpace> dbspacelist = spacejpa.findDbSpaceEntities();
+        List<DbBall> dbballlist = balljpa.findDbBallEntities();
+        List<DbObstacle> dbobstaclelist = obstaclejpa.findDbObstacleEntities();
+        List<DbStopitem> dbstopitemlist = stopitemjpa.findDbStopitemEntities();
+
+        for (DbSpace dbspace : dbspacelist) {
+            if (dbspace.getName().equals(spaceName)) {
+                id = dbspace.getId();
+            }
+        }
+
+        try {
+
+            for (DbBall dbball : dbballlist) {
+
+                if (dbball.getIdSpace() == id) {
+                    int ballid = dbball.getId();
+                    balljpa.destroy(ballid);
+                }
+            }         for (DbObstacle dbobstacle : dbobstaclelist) {
+
+                if (dbobstacle.getIdSpace() == id) {
+                    int obstacleid = dbobstacle.getId();
+                    obstaclejpa.destroy(obstacleid);
+                }
+            }
+
+            for (DbStopitem dbstopitem : dbstopitemlist) {
+
+                if (dbstopitem.getIdSpace() == id) {
+                    int stopid = dbstopitem.getId();
+                    stopitemjpa.destroy(stopid);
+                }
+            }
+
+            spacejpa.destroy(id);
+        } catch (NonexistentEntityException ex) {// 
+            Logger.getLogger(DBHandler.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+    }
 
     public void insertBalls(ArrayList<Ball> list) {
 

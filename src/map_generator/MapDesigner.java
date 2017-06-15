@@ -16,18 +16,15 @@ import javax.swing.JFrame;
  */
 public class MapDesigner extends JFrame {
     
-    public MapDesigner() {
+    public MapDesigner() throws IOException {
         super("PhysicsBalls - Map designer");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        try {
-            add(new Designer(this));
-        } catch (IOException ex) {
-            Logger.getLogger(MapDesigner.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        add(new Designer(this));
         pack();
         setLocationRelativeTo(null);
         setResizable(false);
         setVisible(true);
     }
     
+
 }

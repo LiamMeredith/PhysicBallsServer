@@ -91,7 +91,6 @@ public class ModuloVisualThread extends ClientThread {
                         default:
                             out.writeObject(new Status(504, "NonExistent action"));
                     }
-                    out.writeObject(new Status(1, "Ok"));
                 } else {
                     out.writeObject(new Status(505, "Petition - wrong value"));
                 }

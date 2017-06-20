@@ -5,7 +5,7 @@
  */
 package physicballsserver;
 
-import estadisticas.Estadisticas;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -24,7 +24,7 @@ public class ModuloVisualThread extends ClientThread {
     String type = "Modulo visual";
     MapaVirtual mapa;
     int nPantalla = -1;
-    private Estadisticas statistics;
+
 
     /**
      * Constructor
@@ -34,13 +34,12 @@ public class ModuloVisualThread extends ClientThread {
      * @param in
      * @param out
      */
-    public ModuloVisualThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, int id, Estadisticas e) {
+    public ModuloVisualThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, int id) {
         super(s, cliAddr);
         this.in = in;
         this.out = out;
         this.mapa = mapa;
         this.nPantalla = id;
-        this.statistics = e;
         this.start();
     }
 
@@ -85,7 +84,6 @@ public class ModuloVisualThread extends ClientThread {
                         case "enviar_estadisticas":
                             StatisticsData d = (StatisticsData) peticion.getObject(0);
                             d.setnPantalla(nPantalla);
-                            statistics.setData(d);
                             //System.out.println(d.velocitat);
                             break;
                         default:
@@ -98,7 +96,6 @@ public class ModuloVisualThread extends ClientThread {
         } catch (IOException ex) {
             System.out.println("Bye " + this.cliAddr);
             mapa.remove(this);
-            statistics.Disconect(nPantalla);
             this.clientSock.close();
         } catch (ClassNotFoundException ex) {
             out.writeObject(new Status(503, "Error with the petition"));

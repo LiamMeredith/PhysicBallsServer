@@ -5,7 +5,7 @@
  */
 package physicballsserver;
 
-import database.DBHandler;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,15 +22,13 @@ public class ServerControllerThread extends ClientThread {
 
     MapaVirtual mapa;
     private PhysicBallsServer server;
-    private DBHandler db = null;
 
-    public ServerControllerThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, PhysicBallsServer server, DBHandler db) {
+    public ServerControllerThread(Socket s, String cliAddr, ObjectInputStream in, ObjectOutputStream out, MapaVirtual mapa, PhysicBallsServer server) {
         super(s, cliAddr);
         this.in = in;
         this.out = out;
         this.mapa = mapa;
         this.server = server;
-        this.db = db;
         this.start();
     }
 
@@ -104,7 +102,6 @@ public class ServerControllerThread extends ClientThread {
                             break;
                         case "get_scenarios":
                             Peticion p1 = new Peticion("get_scenarios");
-                            p1.pushData(db.getSpaceList1());
                             out.writeObject(p1);
                             break;
                         case "echo":

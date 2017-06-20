@@ -5,8 +5,7 @@
  */
 package physicballsserver;
 
-import database.DBHandler;
-import estadisticas.Estadisticas;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -19,7 +18,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import map_generator.MapDesigner;
 import org.physicballs.items.*;
 
 /**
@@ -38,9 +36,6 @@ public class PhysicBallsServer {
     private boolean open = false;
     private static DatagramSocket bcListener;
     private int stadisticID = 0;
-    private Estadisticas statistics = null;
-    private DBHandler db = null;
-    private MapDesigner md = null;
     private String scenario = "No map";
 
     /**
@@ -60,20 +55,6 @@ public class PhysicBallsServer {
              * Precaution initialization
              */
             mapa = new MapaVirtual(0, 0);
-
-            //Objeto de Toni
-            statistics = new Estadisticas();
-            statistics.setVisible(true);
-
-            //Objeto de Tore
-            db = new DBHandler();
-
-            //Objecto de miki gines
-            String message = "Would like to open the map generator";
-            int reply = JOptionPane.showConfirmDialog(null, message, "Map generator", JOptionPane.YES_NO_OPTION);
-            if (reply == JOptionPane.YES_OPTION) {
-                md = new MapDesigner();
-            } 
 
             /**
              * Local variables
@@ -117,7 +98,7 @@ public class PhysicBallsServer {
                                  * thread and delivers a response
                                  */
                                 stadisticID++;
-                                ModuloVisualThread mvt = new ModuloVisualThread(clientSock, cliAddr, in, out, mapa, stadisticID, statistics);
+                                ModuloVisualThread mvt = new ModuloVisualThread(clientSock, cliAddr, in, out, mapa, stadisticID);
                                 ArrayList<Walls.wall> flag = mapa.push(mvt);
                                 if (flag == null) {
                                     out.writeObject(new Status(510, "No capacity in map"));
@@ -126,7 +107,6 @@ public class PhysicBallsServer {
                                     reg.pushData(new Status(1, "Ok"));
                                     reg.pushData(flag);
                                     reg.pushData(scenario);
-                                    reg.pushData(db.selectSpace(scenario));
                                     out.writeObject(reg);
                                 }
 
@@ -137,7 +117,7 @@ public class PhysicBallsServer {
                                  * send a petition object
                                  */
                                 out.writeObject(new Status(1, "Ok"));
-                                new ServerControllerThread(clientSock, cliAddr, in, out, mapa, this, db);
+                                new ServerControllerThread(clientSock, cliAddr, in, out, mapa, this);
                                 break;
                             case "client_controller":
                                 /**
